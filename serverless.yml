@@ -1,0 +1,54 @@
+service: computer-store-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+custom:
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3001
+    noPrependStageInUrl: false
+    reloadHandler: true
+    
+plugins:
+  - serverless-offline
+
+functions:
+  createItem:
+    handler: src/handlers/createItem.handle
+    events:
+      - http:
+          path: /items
+          method: post
+
+  getAllItems:
+    handler: src/handlers/getAllItems.handle
+    events:
+      - http:
+          path: /items
+          method: get
+  
+  getItemById:
+    handler: src/handlers/getItemById.handle
+    events:
+      - http:
+          path: /items/{id}
+          method: get
+    
+  updateItem:
+    handler: src/handlers/updateItem.handle
+    events:
+      - http:
+          path: /items/{id}
+          method: put
+
+  deleteItem:
+    handler: src/handlers/deleteItem.handle
+    events:
+      - http:
+          path: /items/{id}
+          method: delete
