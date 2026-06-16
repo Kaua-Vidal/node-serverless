@@ -1,19 +1,38 @@
-const itemService = require("../services/itemService");
-const lambdaWrapper = require("../utils/lambdaWrapper");
-const AppError = require("../errors/AppError");
+import Ajv from "ajv";
+import { CreateItemService } from "../services/createItemService";
+import { ValidatorHelper } from "../helpers/ValidadorHelper";
+import { itemSchema } from "../schemas/itemSchema";
 
-const baseHandler = async (event) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+const ajv = new Ajv({ allErrors: true });
+const validate = ajv.compile(itemSchema);
 
-  const body = JSON.parse(event.body || "{}");
+export const handle = async (event) => {
+  try {
+    ValidatorHelper.ensureBodyExists(event.body);
 
-  const newItem = await itemService.create(data);
+    const data = JSON.parse(event.body);
 
-  return {
-    statusCode: 201,
-    body: JSON.stringify(newItem),
-  };
+    const valid = validate(data);
+    if (!valid) {
+      const validationError = new Error(
+        "Falha na validação dos dados de entrada",
+      );
+      validationError.statusCode = 400;
+      validationError.errors = validate.errors;
+      throw validationError;
+    }
+
+    const itemCriado = await createItemService(data);
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify(newItem),
+    };
+  } catch (error) {
+    return {
+      statusCode: error.statusCode,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: error.message }),
+    };
+  }
 };
-
-const handle = lambdaWrapper(baseHandler);
-module.exports = { handle };
