@@ -1,19 +1,33 @@
-const itemService = require("../services/itemService");
-const lambdaWrapper = require("../utils/lambdaWrapper");
+const { updateItemService}  = require("../services/updateItemService");
+const { ensureBodyMatchesSchema, ensureIdExists, validateAndParseBody } = require("../helpers/ValidatorHelper");
+const { updateItemSchema } = require("../schemas/itemSchema");
 
 const baseHandler = async (event) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+  try {
+    
+    const id = event.pathParameters?.id;
+    const data = validateAndParseBody(event.body);
 
-  const { id } = event.pathParameters;
-  const data = JSON.parse(event.body);
+    ensureBodyMatchesSchema(data, updateItemSchema);
+    ensureIdExists(id);
 
-  const updatedItem = await itemService.update(id, data);
+    const itemUpdated = await updateItemService(id, data);
 
-  return {
+    return {
     statusCode: 200,
-    body: JSON.stringify(updatedItem),
+    headers: { "Content-Type": "application/json"},
+    body: JSON.stringify(itemUpdated),
   };
+  } catch(error) {
+    return {
+      statusCode: error.statusCode || 500,
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify({
+        message: error.message || "Ocorreu um erro no sistema."
+      })
+    }
+  }
 };
 
-const handle = lambdaWrapper(baseHandler)
-module.exports = { handle }
+
+module.exports = { handle };

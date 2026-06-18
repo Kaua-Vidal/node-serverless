@@ -7,4 +7,5 @@ const ItemSchema = new mongoose.Schema({
     image_url: { type: String, required: true}
 }, { timestamps: true});
 
-module.exports = mongoose.models.Item || mongoose.model('Item', ItemSchema);
+const ItemModel = mongoose.models.Item || mongoose.model('Item', ItemSchema);
+module.exports = { ItemModel };

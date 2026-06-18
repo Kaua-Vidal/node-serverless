@@ -1,27 +1,28 @@
+const { getItemService } = require("../services/getItemService");
+const { ensureIdExists } = require("../helpers/ValidatorHelper");
 
 
-export const handle = async (event) => {
+const handle = async (event) => {
   try {
+
     const id = event.pathParameters?.id;
 
-    ValidatorHelper
-  } catch() {
+    ensureIdExists(id);
 
+    const item = await getItemService(id);
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(item),
+    };
+  } catch(error) {
+    return {
+      statusCode: error.statusCode || 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        message: error.message || "Ocorreu um erro inesperado no servidor." }) 
+    }
   }
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  const { id } = event.pathParameters;
-
-  const item = await itemService.getById(id);
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(item),
-  };
 };
-
-
-
-const handle = lambdaWrapper(baseHandler);
 
 module.exports = { handle };

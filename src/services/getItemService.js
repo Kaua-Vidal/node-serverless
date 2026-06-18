@@ -1,27 +1,18 @@
-/*async getById(id){
-        await connectDataBase();
-        const item = await Item.findById(id);
+const { ItemModel } = require("../models/Item");
+const { connectDataBase } = require("../config/db");
 
-        if(!item) {
-            throw new AppError("Item não encontrado.", 404);
-        }
-        return item;
-    }*/
-import { ItemModel } from '../models/Item';
-import { connectDataBase } from '../config/db'
+async function getItemService(id) {
+  await connectDataBase();
 
-export class getItemService{
-    async execute(id) {
-        await connectDataBase();
+  const item = await ItemModel.findById(id);
 
-        const item = await ItemModel.findById(id);
+  if (!item) {
+    const error = new Error("Item não encontrado no banco de dados");
+    error.statusCode = 404;
+    throw error;
+  }
 
-        if (!item) {
-            const error = new Error("Item não encontrado no banco de dados");
-            error.statusCode = 404;
-            throw error;
-        }
-
-        return item;
-    }
+  return item;
 }
+
+module.exports = { getItemService };

@@ -1,20 +1,31 @@
-const itemService = require("../services/itemService");
-const lambdaWrapper = require("../utils/lambdaWrapper");
+const { deleteItemService } = require("../services/deleteItemService");
+const { ensureIdExists } = require("../helpers/ValidatorHelper");
 
-const baseHandler = async (event) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+const handle = async (event) => {
+  try {
 
-  const { id } = event.pathParameters;
+    const id = event.pathParameters?.id;
 
-  const deletedItem = await itemService.delete(id);
+    ensureIdExists(id);
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: `Item "${deletedItem.name}" removido com sucesso!`,
-    }),
-  };
+    const itemDeleted = await deleteItemService(id);
+
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify({
+        message: `Item "${itemDeleted.name}" removido com sucesso!`,
+      }),
+    };
+  } catch (error) {
+    return {
+      statusCode: error.statusCode || 500,
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify({
+        message: error.message || "Ocorreu um erro inesperado no servidor."
+      })
+    }
+  }
 };
 
-const handle = lamdaWrapper(baseHandler);
 module.exports = { handle };

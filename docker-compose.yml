@@ -1,7 +1,6 @@
 services:
   mongodb:
     image: mongo:7
-    container_name: mongo-serverless
     ports:
       - "27017:27017"
     volumes:

@@ -1,21 +1,26 @@
 service: computer-store-api
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs24.x
 
   environment:
     MONGO_URI: ${env:MONGO_URI}
+    STAGE: ${env:STAGE}
 custom:
   serverless-offline:
-    httpPort: 3000
-    lambdaPort: 3001
+    httpPort: 3001
+    lambdaPort: 3002
     noPrependStageInUrl: false
     reloadHandler: true
     
 plugins:
+  - serverless-dotenv-plugin
   - serverless-offline
+
 
 functions:
   createItem:

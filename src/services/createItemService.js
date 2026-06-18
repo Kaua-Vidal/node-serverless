@@ -1,9 +1,12 @@
-import { connectDataBase } from "../config/db";
-import { ItemModel } from "../models/Item";
+const { connectDataBase } = require("../config/db");
+const { ItemModel } = require("../models/Item");
 
-export async function CreateItemService(data) {
+async function createItemService(data) {
+  
   await connectDataBase();
   const newItem = new ItemModel(data);
   await newItem.save();
   return newItem;
 }
+
+module.exports = { createItemService };

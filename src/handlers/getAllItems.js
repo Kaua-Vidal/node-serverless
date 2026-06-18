@@ -1,17 +1,25 @@
-const itemService = require("../services/itemService");
-const lambdaWrapper = require("../utils/lambdaWrapper");
+const { getAllItemsService } = require("../services/getAllItemsService");
 
-const baseHandler = async (event) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+const handle = async (event) => {
+  try {
+    const items = await getAllItemsService();
 
-  const items = await itemService.getAll();
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify(items),
+    };
+  } catch (error) {
+    return {
+      statusCode: error.statusCode || 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: error.message || "Ocorreu um erro inesperado ao listar os itens."
+      })
+    }
+  }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(items),
-  };
 };
 
-
-const handle = lamdaWrapper(baseHandler);
 module.exports = { handle };
+
