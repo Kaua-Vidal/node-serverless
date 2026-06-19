@@ -12,13 +12,10 @@ provider:
 
 custom:
   serverless-offline:
-    useChildProcesses: false
-    binary:
-      types:
-        - "application/gzip"
-    httpPort: 3000
-    lambdaPort: 3001
-    host: 0.0.0.0
+    httpPort: 3001
+    lambdaPort: 3002
+    noPrependStageInUrl: false
+    reloadHandler: true
 
 plugins:
   - serverless-dotenv-plugin

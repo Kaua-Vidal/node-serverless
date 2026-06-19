@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "serverless offline"
+    "dev": "nodemon --exec \"serverless offline -c serverless_local.yml\""
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "jest": "^29.0.0",
+    "nodemon": "3.1.4",
     "serverless": "https://repository.phoebus.com.br/repository/npm-releases/osls/-/osls-3.40.1.tgz",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^13.10.0"
